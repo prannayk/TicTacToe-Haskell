@@ -1,3 +1,5 @@
+module Layout where
+
 import System.IO
 import System.Process
 
@@ -8,11 +10,11 @@ infixr 5 ..*
 infixr 5 ./
 infixr 5 ../
 
+
 data Cell = O | X | Empty | Q | W | E | A | S | D | Z | C | V deriving (Show,Eq)
 type Row a = [a]
 type GameState = Row (Row Cell)
 type GamePlay = (Cell,Cell,GameState)
-
 data Tree a = EmptyTree | Node a (Row (Tree a)) deriving (Eq, Show)
 type GameTree = Tree GamePlay
 
@@ -21,6 +23,9 @@ Empty .+ ys = ys
 ys .+ Empty = ys
 X .+ _ = X
 O .+ _ = O
+
+minus :: Cell -> Cell -> Cell
+minus x y = if(x == y) then Empty else x
 
 inv :: Cell -> Cell
 inv O = X
@@ -44,6 +49,9 @@ Empty ./ _ = Empty
 
 (..+) :: GameState -> GameState -> GameState
 game ..+ move = zipWith (\x y -> (zipWith (.+) x y)) game move
+
+(...++) :: GameState -> GameState -> GameState
+game ...++ move = zipWith (\x y -> (zipWith minus x y)) game move
 
 (..*) :: Cell -> GameState -> GameState
 cell ..* game = map (map (cell .* )) game
@@ -116,7 +124,5 @@ playGame (move,winner,game) gamesLeft = do
 	else 
 		putStrLn $ (show)winner ++ " has Won the game!"
 
-main :: IO ()
-main = do
-	playGame (O,Empty,(initializeEmpty)) initiliazeGames
-	return ()
+nextMoves ::  GamePlay -> Row GameState -> Row GameState
+nextMoves (move,_,game) gamesLeft = map (game ..+) $ (map (move ..*) gamesLeft)
