@@ -28,3 +28,6 @@ minimax (c,b,gamePlay) gamesLeft = let
 	tree = (constructTree (c,b,gamePlay) gamesLeft 5)
 	(_,Node (_,_,a) treeList) = maximize tree
 	in (a ...++ gamePlay)
+
+main = do
+	putStrLn "rolling on the high roads!"
